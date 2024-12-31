@@ -6,7 +6,7 @@
 ## About This Portal
 This web application is primarily designed to enhance the academic experience for Students and Professors, offering a seamless platform for managing and interacting with course materials, attendance, and academic information.
 
-# Professors:
+## Professors:
 Professors have access to all the essential tools needed to manage their courses effectively. They can:
 
 View detailed information about the students enrolled in their courses.
@@ -16,7 +16,7 @@ Track and update student attendance.
 Ensure that students are always up-to-date with the latest course-related materials and information.
 
 
-#Students:
+## Students:
 Students can easily track their academic progress and stay updated on course activities. They can:
 
 View their attendance details across all the courses they have opted for.
