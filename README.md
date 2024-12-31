@@ -1,8 +1,9 @@
-# MERN Stack Project
+# Student Professor Portal
 
-## Student Professor Portal
+## MERN Stack Project
 
-# About This Portal
+
+## About This Portal
 This web application is primarily designed to enhance the academic experience for Students and Professors, offering a seamless platform for managing and interacting with course materials, attendance, and academic information.
 
 # Professors:
