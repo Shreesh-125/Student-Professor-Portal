@@ -40,12 +40,10 @@ While the Administration plays a role in setting up the structure of courses, pr
 # SETUP
 
 ## Installation:
-cmd->  cd .\backend\ 
+In frontend folder
         npm install
       
-        cd..
-
-        cd .\frontend\
+In Backend Folder
         npm install
 
 
