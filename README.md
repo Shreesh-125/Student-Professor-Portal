@@ -36,28 +36,16 @@ While the Administration plays a role in setting up the structure of courses, pr
 
 
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Setup
 
-# 🚀 Project Setup
-## 📥 Installation
+## Installation
+
 Follow these steps to set up the project locally:
 
-## 🖼️ Frontend Setup
-Navigate to the frontend folder:
-bash
-cd frontend
-
-Install the required dependencies:
-bash
-npm install
-
-## 🖥️ Backend Setup
-Navigate to the backend folder:
-bash
-cd backend
-
-Install the required dependencies:
-bash
-npm install
+### Frontend Setup
+1. Navigate to the `frontend` folder:  
+   ```bash
+   cd frontend
 
 Also take a look on .gitignore
 
