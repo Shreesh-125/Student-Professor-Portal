@@ -84,15 +84,14 @@ Note: Replace the placeholders (your_*) with actual values. These variables are 
 ## ▶️ Starting the Application
 Start both the backend and frontend servers using the commands below:
 
-Start Backend:
+1. Start backend:  
    ```bash
-  cd backend
-  yarn dev
-
-Start Frontend:
+   cd backend
+   npm run dev
+2. Start Frontend:
    ```bash
-  cd ..
-  cd frontend
-  yarn dev
+   cd ..
+   cd frontend
+   npm run dev
 
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
