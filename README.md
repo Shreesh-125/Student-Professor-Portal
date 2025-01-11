@@ -1,55 +1,70 @@
-# Student Professor Portal
+# 🎓 Student Professor Portal  
 
-## MERN Stack Project
+## MERN Stack Project  
 
+### About This Portal  
+This web application is designed to enhance the academic experience for **Students** and **Professors** by offering a seamless platform for managing course materials, attendance, and academic information.  
 
-## About This Portal
-This web application is primarily designed to enhance the academic experience for Students and Professors, offering a seamless platform for managing and interacting with course materials, attendance, and academic information.
+---
 
-## Professors:
-Professors have access to all the essential tools needed to manage their courses effectively. They can:
+### 👨‍🏫 Professors:  
+Professors have access to essential tools to effectively manage their courses. They can:  
+- View detailed information about the students enrolled in their courses.  
+- Upload PDFs and other resources for students to access.  
+- Modify course patterns, such as updating quizzes, exams, and assignments.  
+- Track and update student attendance.  
+- Ensure students stay up-to-date with the latest course-related materials and information.  
 
-View detailed information about the students enrolled in their courses.
-Upload PDFs and other resources for students to access.
-Modify course patterns, such as updating quizzes, exams, and assignments.
-Track and update student attendance.
-Ensure that students are always up-to-date with the latest course-related materials and information.
+---
 
+### 👨‍🎓 Students:  
+Students can effortlessly track their academic progress and stay informed about course activities. They can:  
+- View their attendance details across all the courses they have opted for.  
+- Download PDFs and course materials uploaded by professors.  
+- Access and review course patterns, including quizzes, exams, and other assessments.  
+- Get detailed information about professors and the courses they teach.  
 
-## Students:
-Students can easily track their academic progress and stay updated on course activities. They can:
+**Note:** While the administration sets up the course structure, professors and students are the primary users, benefiting from the platform's streamlined academic management features.  
 
-View their attendance details across all the courses they have opted for.
-Download PDFs and course materials uploaded by professors.
-Access and review course patterns, including quizzes, exams, and other assessments.
-Get detailed information about professors and the courses they teach.
-While the Administration plays a role in setting up the structure of courses, professors and students are the primary users, benefiting from the streamlined academic management features of this platform. The application fosters better communication, organization, and academic success.
+---
 
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+## 🛠️ Tech Stack  
 
-## Tech Stack
-- **Frontend**: React.js, Tailwind CSS, Vite
-- **Backend**: Node.js, Express.js
-- **Database**: MongoDB
-- **Authentication**: JSON Web Tokens (JWT)
-- **Other Tools**: Axios, Redux
+- **Frontend**: React.js, Tailwind CSS, Vite  
+- **Backend**: Node.js, Express.js  
+- **Database**: MongoDB  
+- **Authentication**: JSON Web Tokens (JWT)  
+- **Other Tools**: Axios, Redux  
 
+---
 
--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-# Setup
+## 🚀 Setup  
 
-## Installation
+### Installation  
 
-Follow these steps to set up the project locally:
+Follow these steps to set up the project locally:  
 
-### Frontend Setup
+#### Frontend Setup  
 1. Navigate to the `frontend` folder:  
    ```bash
    cd frontend
 
-Also take a look on .gitignore
+2. Install Dependencies:
+   ```bash
+   npm install
 
-## .env file stuff
+#### Backend Setup
+1. Navigate to the `backend` folder:  
+   ```bash
+   cd backend
+2. Install Dependencies:
+   ```bash
+   npm install
+
+
+## 🗂️ .env File Configuration
+Create a .env file in the backend folder and add the following variables:
+
 MONGO_URI=your_mongodb_connection_string
 PORT=your_server_port
 SECRET_KEY=your_jwt_secret_key
@@ -62,12 +77,21 @@ CLOUDINARY_URL=your_cloudinary_url
 
 FRONTEND_URL=your_frontend_url
 
-## Running
+
+Note: Replace the placeholders (your_*) with actual values. These variables are required to run the project successfully.
+
+
+## ▶️ Starting the Application
+Start both the backend and frontend servers using the commands below:
+
+Start Backend:
+   ```bash
   cd backend
   yarn dev
-  
-  cd ..
 
+Start Frontend:
+   ```bash
+  cd ..
   cd frontend
   yarn dev
 
