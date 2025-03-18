@@ -30,14 +30,14 @@ function Navbar() {
     <>
       {/* Navbar */}
       <div className="bg-gray-50 shadow-md w-full fixed top-0 z-10">
-        <div className="flex items-center justify-between h-16 px-4 md:px-8 ">
+        <div className="flex items-center justify-between h-20 md:h-16 px-4 md:px-8  ">
           {/* Logo Section */}
           <div>
-            <h1 className="text-2xl font-bold">
-              Academic <span className="text-[#29648A]">Portal</span>
+            <h1 className="text-3xl font-bold font-kanit">
+              Student-Professor <span className="text-[#25274D]">Portal</span>
             </h1>
           </div>
-
+          
           {/* User Actions */}
           <div>
             <Popover>

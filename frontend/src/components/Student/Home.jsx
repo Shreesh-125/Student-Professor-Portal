@@ -8,7 +8,7 @@ import { useNavigate } from "react-router-dom";
 
 function Home() {
   const [schedule, setSchedule] = useState(null);
-  const [loading, setLoading] = useState(true); // Track authentication check
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const [derivedSchedule, setDerivedSchedule] = useState({
     classTimes: [],
@@ -19,7 +19,6 @@ function Home() {
   const { user } = useSelector((store) => store.app);
   const [date, setDate] = useState(new Date());
 
-  // Helper function to format dates as "DD-MM-YYYY"
   const formatToDDMMYYYY = (date) => {
     const day = date.getDate().toString().padStart(2, "0");
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
@@ -27,13 +26,63 @@ function Home() {
     return `${day}-${month}-${year}`;
   };
 
-  const ScheduleSection = ({ title, items, itemColor }) => (
+  useEffect(() => {
+    const fetchStudentData = async () => {
+      try {
+        if (user && user._id) {
+          const response = await axios.get(
+            `${USER_API_END_POINT}/student/${user._id}`,
+            { withCredentials: true }
+          );
+          setSchedule(response.data.schedule);
+        } else {
+          navigate("/");
+        }
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+        navigate("/");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStudentData();
+  }, [user, navigate]);
+
+  const todayFormattedDate = useMemo(() => formatToDDMMYYYY(new Date()), []);
+  const selectedDateFormatted = useMemo(() => formatToDDMMYYYY(date), [date]);
+  const dayOfWeek = useMemo(
+    () => date.toLocaleString("en-us", { weekday: "long" }),
+    [date]
+  );
+
+  const isPastDate = (selectedDate) => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Ignore time for comparison
+    return selectedDate < today;
+  };
+  
+
+  const handleDateSelect = (selectedDate) => {
+    const newDate = new Date(selectedDate);
+    if (!isNaN(newDate.getTime())) {
+      setDate(newDate);
+    } else {
+      console.error("Invalid date selected");
+    }
+  };
+
+  const ScheduleSection = ({ title, items, itemColor, isFaded }) => (
     <div className="w-full text-center">
       <h3 className="font-bold text-xl text-gray-700">{title}</h3>
       <div className="flex flex-col gap-2 mt-3">
         {items.map((item, index) => (
           <p
-            className={`${itemColor} text-white px-4 py-2 rounded-full font-medium shadow-md`}
+            className={`${
+              isFaded
+                ? "opacity-50 cursor-not-allowed"
+                : "opacity-100"
+            } ${itemColor} text-white px-4 py-2 rounded-full font-medium shadow-md`}
             key={index}
           >
             {`${item.courseCode} at ${item.time || item.startTime}`}
@@ -42,46 +91,16 @@ function Home() {
       </div>
     </div>
   );
+  const isFaded = isPastDate(date);  
 
-  // Fetch student data
-  useEffect(() => {
-    const fetchstudentData = async () => {
-      try {
-        const response = await axios.get(
-          `${USER_API_END_POINT}/student/${user._id}`,
-          { withCredentials: true }
-        );
-        setSchedule(response.data.schedule);
-      } catch (error) {
-        console.error("Error fetching student data:", error);
-      } finally {
-        setLoading(false); // Stop loading after authentication check
-      }
-    };
-
-    if (user && user._id) {
-      fetchstudentData();
-    }
-  }, [user]);
-
-  // Memoize current day and formatted date
-  const todayFormattedDate = useMemo(() => formatToDDMMYYYY(date), [date]);
-  let dayOfWeek = useMemo(
-    () => date.toLocaleString("en-us", { weekday: "long" }),
-    [date]
-  );
-
-  // Update derived schedule whenever `schedule` or `date` changes
   useEffect(() => {
     if (schedule) {
       const classTimes =
-        schedule.classTime?.filter(
-          (classItem) => classItem.day === dayOfWeek
-        ) || [];
+        schedule.classTime?.filter((classItem) => classItem.day === dayOfWeek) ||
+        [];
       const extraClasses =
-        schedule.extraClass?.filter(
-          (extra) => extra.date === todayFormattedDate
-        ) || [];
+        schedule.extraClass?.filter((extra) => extra.date === selectedDateFormatted) ||
+        [];
       const labTimings = schedule.hasLab
         ? schedule.labTiming?.filter((lab) => lab.day === dayOfWeek) || []
         : [];
@@ -94,100 +113,92 @@ function Home() {
         hasLab,
       });
     }
-  }, [schedule]);
-
-  useEffect(() => {
-    if (!user || !user._id) {
-      navigate("/");
-    }
-  }, [user, navigate]);
-
-  const handleDateSelect = (selectedDate) => {
-    // Ensure that the selected date is a valid Date object
-    const newDate = new Date(selectedDate);
-
-    // Check if the new date is valid
-    if (!isNaN(newDate.getTime())) {
-      setDate(newDate); // Set the new date if it's valid
-    } else {
-      console.error("Invalid date selected");
-    }
-  };
+  }, [schedule, dayOfWeek, selectedDateFormatted]);
 
   if (loading) {
     return null;
   }
 
   if (!schedule) {
-    return <div>Loading...</div>; // Render loading state if schedule is not yet fetched
+    return <div>Loading...</div>;
   }
 
   return (
-    <div className="flex min-h-screen">
-      {/* Sidebar */}
+    <div className="flex min-h-screen font-kanit text-gray-100">
       <Sidebar />
 
-      {/* Main Content */}
-      <div className="mt-20 mx-auto w-[900px] px-4">
-        <h1 className="text-3xl font-bold mb-12 text-gray-800">
+      <div className="mt-20 mx-auto px-6 w-full max-w-[900px]">
+        <h1 className="text-5xl font-extrabold mb-12 text-center text-[#121A27] ">
           Welcome, {user?.fullname || "Student"}!
         </h1>
 
-        <div className="flex flex-col gap-16 lg:flex-row">
-          {/* Student's Calendar */}
+        <div className="flex flex-col gap-16 lg:flex-row lg:items-start">
           <div className="flex justify-center">
             <Calendar
               mode="single"
               selected={date}
-              onSelect={handleDateSelect} // Use the new handler
-              className="rounded-md border shadow-md"
+              onSelect={handleDateSelect}
+              className="rounded-lg border shadow-xl p-6 bg-gray-100 text-gray-900"
               classNames={{
-                day_selected: "bg-blue-600 text-white font-bold rounded-full",
-                day_hovered: "hover:bg-blue-200",
-                day_today: "bg-blue-500 text-white font-bold rounded-full", // Styling for today's date
+                day_selected: "bg-[#27364B] text-white font-bold rounded-full",
+                day_hovered: "hover:bg-[#F0F4FB]",
+                day_today: "bg-[#556C8A] text-white font-bold rounded-full",
               }}
             />
           </div>
 
-          {/* Schedule Details */}
-          <div className="flex flex-col gap-4 items-center">
-            {/* Display Classes Today */}
+          <div className="flex flex-col gap-8 w-full">
             {derivedSchedule.classTimes.length > 0 && (
               <ScheduleSection
-                title="Today's Classes"
+                title={
+                  selectedDateFormatted === todayFormattedDate
+                    ? "Today's Classes"
+                    : "Classes"
+                }
                 items={derivedSchedule.classTimes}
-                itemColor="bg-blue-500"
+                itemColor="bg-gradient-to-r from-[#556C8A] to-[#859AB8]"
+                isFaded={isFaded}
               />
             )}
 
-            {/* Display Extra Classes Today */}
             {derivedSchedule.extraClasses.length > 0 && (
               <ScheduleSection
-                title="Extra Classes Today"
+                title={
+                  selectedDateFormatted === todayFormattedDate
+                    ? "Today's Extra Classes"
+                    : "Extra Classes"
+                }
                 items={derivedSchedule.extraClasses}
-                itemColor="bg-gray-700"
+                itemColor="bg-gradient-to-r from-gray-700 to-gray-600"
+                isFaded={isFaded}
               />
             )}
 
-            {/* Display Lab Sessions */}
             {derivedSchedule.hasLab &&
               derivedSchedule.labTimings.length > 0 && (
                 <ScheduleSection
-                  title="Lab Sessions Today"
+                  title={
+                    selectedDateFormatted === todayFormattedDate
+                      ? "Today's Lab Sessions"
+                      : "Lab Sessions"
+                  }
                   items={derivedSchedule.labTimings}
-                  itemColor="bg-teal-600"
+                  itemColor="bg-gradient-to-r from-teal-700 to-teal-600"
+                  isFaded={isFaded}
                 />
               )}
 
-            {/* No Classes, Extra Classes, or Labs Today */}
             {derivedSchedule.classTimes.length === 0 &&
               derivedSchedule.extraClasses.length === 0 &&
               (!derivedSchedule.hasLab ||
                 derivedSchedule.labTimings.length === 0) && (
                 <div className="mt-4 text-center">
-                  <h3 className="text-lg font-medium text-gray-600">
-                    No Classes, Extra Classes, or Labs Today
+                  <h3 className="text-2xl font-semibold text-gray-200">
+                    No Classes, Extra Classes, or Labs Scheduled
                   </h3>
+                  <p className="text-gray-400 mt-2">
+                    Select a different date or take a break!
+                  </p>
                 </div>
               )}
           </div>

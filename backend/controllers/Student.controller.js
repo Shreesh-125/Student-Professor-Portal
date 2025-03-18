@@ -530,4 +530,69 @@ export const getProfessorDetails= async(req,res)=>{
   }
 }
 
+export const getmarks = async (req, res) => {
+  try {
+    const { courseCode } = req.params;
+    
+    // Use `findOne` instead of `find`
+    const course = await Courses.findOne({ courseCode });
+    
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found",
+        success: false
+      });
+    }
+
+    const courseid = course._id;
+    const studentid = req.id;
+    const student = await Student.findById(studentid);
+
+    if (!student) {
+      return res.status(404).json({
+        message: "Student not found",
+        success: false
+      });
+    }
+    
+    const courseMarks = student.marks.find((item) => item.course.equals(courseid));
+
+    if (!courseMarks) {
+      return res.status(404).json({
+        message: "No marks found for this course",
+        success: false
+      });
+    }
+
+    let finalmarks = [];
+
+    courseMarks.mark.forEach((it) => {
+      const patternMatch = course.pattern.find((ele) => ele._id.equals(it.patternid));
+
+      if (patternMatch) {
+        finalmarks.push({
+          name: patternMatch.name,
+          weightage: patternMatch.weightage,
+          mark: it.marks,
+          lastUpdated:it.lastUpdated
+        });
+      }
+    });
+
+    return res.status(200).json({
+      message: "Marks Extracted Successfully",
+      success: true,
+      marks: finalmarks
+    });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: "Internal Server Error",
+      success: false
+    });
+  }
+};
+
+
   

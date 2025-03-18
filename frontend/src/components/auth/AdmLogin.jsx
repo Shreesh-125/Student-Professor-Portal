@@ -1,7 +1,7 @@
 import { setLoading, setUser } from '@/redux/appSlice';
 import { USER_API_END_POINT } from '@/utils/constant';
 import { Label } from '@radix-ui/react-label';
-import image from '../../../public/AdmLoginImg.png';
+import image from '/AdmLoginImg.png';
 import React, { useState } from 'react';
 import axios from "axios";
 import { useDispatch, useSelector } from 'react-redux';
@@ -9,7 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../ui/button';
 import { Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { Input } from '../ui/input';
+import { Input } from '../ui/input';    
 
 function AdmLogin() {
 
@@ -64,71 +64,79 @@ function AdmLogin() {
             }
         } catch (error) {
             console.log(error);
-            toast.error(error.message);
+            toast.error(error.response.data.message);
         } finally {
             dispatch(setLoading(false));
         }
     };
 
     return (
-        <div className='flex flex-col items-center gap-16 bg-gray-50 min-h-screen'>
-             <h1 className="text-5xl  font-inter mt-16 font-bold text-gray-800 drop-shadow-md text-center">
-                Academic Portal
-            </h1>
+        <div className="flex flex-col items-center gap-16 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen">
+    <h1 className="text-5xl font-kanit mt-16 font-bold text-[#121A27] drop-shadow-lg text-center">
+        Student-Professor Portal
+    </h1>
 
-            <div className="flex w-[80vw] md:w-[750px] h-[450px] shadow-lg rounded-xl overflow-hidden bg-white border border-gray-200 ">
-                {/* Left Container */}
-                <div className="w-full flex flex-col items-center md:w-1/2">
-                    <form onSubmit={submitHandler} className="my-10 flex flex-col">
-                        <h1 className="text-3xl font-inter font-bold text-gray-700 mb-10 mt-4">Admin Login</h1>
-                        
-                        {/* Email Input */}
-                        <div className="my-2 w-[250px]">
-                            <Label>Email</Label>
-                            <Input 
-                                value={input.email} 
-                                name="email" 
-                                onChange={changeEventHandler} 
-                                type="email" 
-                                placeholder="Email" 
-                            />
-                            {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                        </div>
-                        
-                        {/* Password Input */}
-                        <div className="my-2 w-[250px]">
-                            <Label>Password</Label>
-                            <Input 
-                                value={input.password} 
-                                name="password" 
-                                onChange={changeEventHandler} 
-                                type="password" 
-                                placeholder="Password" 
-                            />
-                            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                        </div>
-                        
-                        {/* Submit Button */}
-                        {
-                            loading 
-                                ? <Button className="w-full my-4"> 
-                                    <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
-                                  </Button>
-                                : <Button type="submit" className="w-full my-4 bg-[#29648A]">Login</Button>
-                        }
-                    </form>
-                </div>
+    <div className="flex w-[80vw] md:w-[750px] h-[450px] shadow-2xl rounded-2xl overflow-hidden bg-white border border-gray-300 ">
+        {/* Left Container */}
+        <div className="w-full flex flex-col items-center justify-center md:w-1/2 px-6">
+            <form onSubmit={submitHandler} className="my-10 flex flex-col font-kanit">
+                <h1 className="text-4xl font-bold text-[#121A27] mb-8 mt-4 text-center">Admin Login</h1>
 
-                {/* Right Container */}
-                <div className="hidden md:block w-1/2">
-                    <img
-                        className="object-cover w-full h-full rounded-r-xl"
-                        src={image}
-                        alt="Login Illustration"
+                {/* Email Input */}
+                <div className="my-3 w-[250px]">
+                    <Label className="text-gray-600">Email</Label>
+                    <Input
+                        value={input.email}
+                        name="email"
+                        onChange={changeEventHandler}
+                        type="email"
+                        placeholder="Enter your email"
+                        className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#121A27]"
                     />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
                 </div>
-            </div>
+
+                {/* Password Input */}
+                <div className="my-3 w-[250px]">
+                    <Label className="text-gray-600">Password</Label>
+                    <Input
+                        value={input.password}
+                        name="password"
+                        onChange={changeEventHandler}
+                        type="password"
+                        placeholder="Enter your password"
+                        className="border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-[#121A27]"
+                    />
+                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                </div>
+
+                {/* Submit Button */}
+                {loading ? (
+                    <Button className="w-full my-4 flex items-center justify-center bg-gray-200 text-gray-700 cursor-not-allowed rounded-lg">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
+                    </Button>
+                ) : (
+                    <Button
+                        type="submit"
+                        className="w-full my-4 bg-[#121A27] text-white rounded-lg px-4 py-2 font-semibold hover:bg-[#1E1E2A] transition-all"
+                    >
+                        Login
+                    </Button>
+                )}
+            </form>
         </div>
+
+        {/* Right Container */}
+        <div className="hidden md:block w-1/2">
+            <img
+                className="w-full h-full object-contain rounded-r-2xl"
+                src={image}
+                alt="Login Illustration"
+            />
+        </div>
+    </div>
+</div>
+
     );
 }
 

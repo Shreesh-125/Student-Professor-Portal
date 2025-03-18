@@ -131,7 +131,7 @@ const handleEditClick = (course) => {
 
     const courseToSubmit = {
       ...newCourse,
-      labTiming: newCourse.hasLab ? newCourse.labTiming : [],
+      labTiming: newCourse.hasLab ? newCourse?.labTiming : [],
     };
 
     try {
@@ -189,16 +189,16 @@ const handleEditClick = (course) => {
 
 const addLabTiming = (data) => {
 
-  if (labTiming.day && labTiming.startTime && labTiming.endTime) {
+  if (labTiming?.day && labTiming?.startTime && labTiming?.endTime) {
     
     data((prev) => ({
       ...prev,
       labTiming: [
         ...prev.labTiming,
         {
-          day: labTiming.day,
-          startTime: formatTime(labTiming.startTime),
-          endTime: formatTime(labTiming.endTime),
+          day: labTiming?.day,
+          startTime: formatTime(labTiming?.startTime),
+          endTime: formatTime(labTiming?.endTime),
         },
       ],
     }));
@@ -219,7 +219,7 @@ const removeClassTiming = (index,data) => {
 const removeLabTiming = (index,data) => {
   data((prev) => ({
     ...prev,
-    labTiming: prev.labTiming.filter((_, i) => i !== index),
+    labTiming: prev.labTiming?.filter((_, i) => i !== index),
   }));
 };
 
@@ -231,59 +231,64 @@ const removeLabTiming = (index,data) => {
   return (
     <div className="min-h-screen flex bg-gray-50">
       <Sidebar />
-      <div className="flex-1 p-6">
+      <div className="flex-1 p-6 font-kanit">
         <div className="flex justify-between items-center mb-10 mt-10 md:mt-6">
-        <h2 className="text-3xl font-extrabold text-blue-900 md:text-4xl">Courses</h2>
+        <div className='border-b-4 border-gray-900'>
+          <h2 className="text-3xl font-extrabold text-[#121A27] md:text-4xl">Courses</h2>
+        </div>
+        
           <input
             type="text"
             placeholder="Search by Course Code"
-            className="p-2 border rounded-lg w-1/3"
+            className="p-2 border rounded-lg w-1/3 text-md font-kanit shadow-md focus:outline-none focus:ring-2 focus:ring-[#333945]"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
           <button
             onClick={() => setIsModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg"
+            className="bg-gray-900 hover:bg-gray-800 text-white px-4 py-2 rounded-lg"
           >
             Add Course
           </button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredCourses.map((course) => (
-            <div
-              key={course._id}
-              className="bg-white shadow-lg rounded-lg p-4 border flex justify-between"
-            >
-              <div className='flex flex-col'>
-                <h3 className="text-xl font-bold">{course?.name}</h3>
-                <p className="text-gray-700 text-md">{course?.courseCode}</p>
-              </div>
-              <div className='flex flex-col'>
-                  <button
-                      className="text-blue-500 hover:underline"
-                      onClick={() => handleEditClick(course)}
-                    >
-                      Edit
-                  </button>
-                <button
-                  className="text-red-500 hover:underline"
-                  onClick={() => {
-                   handleDeleteClick(course._id)
-                  }}
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+  {filteredCourses.map((course) => (
+    <div
+      key={course._id}
+      className="bg-white shadow-md rounded-xl p-5 border border-gray-200 hover:shadow-lg transition-all duration-300 flex flex-col justify-between"
+    >
+      {/* Course Details */}
+      <div>
+        <h3 className="text-xl font-semibold text-[#121A27]">{course?.name}</h3>
+        <p className="text-gray-600 text-sm">{course?.courseCode}</p>
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-between mt-4">
+        <button
+          className="px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-all"
+          onClick={() => handleEditClick(course)}
+        >
+          Edit
+        </button>
+        <button
+          className="px-3 py-1 text-sm font-medium text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700 transition-all"
+          onClick={() => handleDeleteClick(course._id)}
+        >
+          Delete
+        </button>
+      </div>
+    </div>
+  ))}
+</div>
+
       </div>
 
       {/* Add Course Modal */}
       {isModalOpen && (
         <div
-          className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center"
+          className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center font-kanit"
           onClick={(e) => {
             if (e.target.classList.contains('bg-gray-900')) {
               setIsModalOpen(false);
@@ -388,7 +393,7 @@ const removeLabTiming = (index,data) => {
                   <div className="grid grid-cols-3 gap-2 mb-2">
                     <select
                       className="p-2 border rounded-lg"
-                      value={labTiming.day}
+                      value={labTiming?.day}
                       onChange={(e) => setLabTiming({ ...labTiming, day: e.target.value })}
                     >
                       <option value="">Select Day</option>
@@ -401,7 +406,7 @@ const removeLabTiming = (index,data) => {
                     <input
                       type="time"
                       className="p-2 border rounded-lg"
-                      value={labTiming.startTime}
+                      value={labTiming?.startTime}
                       onChange={(e) =>
                         setLabTiming({ ...labTiming, startTime: e.target.value })
                       }
@@ -423,7 +428,7 @@ const removeLabTiming = (index,data) => {
                     </button>
                   </div>
                   <ul className="list-disc pl-5">
-                    {newCourse.labTiming.map((timing, index) => (
+                    {newCourse.labTiming?.map((timing, index) => (
                       <li key={index} className='flex justify-between items-center'>
                         {timing.day} - {timing.startTime} to {timing.endTime}
                         <button
@@ -462,7 +467,7 @@ const removeLabTiming = (index,data) => {
       )}
 
           {isDeleteModalOpen && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center font-kanit">
               <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
                 <h3 className="text-xl font-bold mb-4">Confirm Delete</h3>
                 <p>Are you sure you want to delete this course?</p>
@@ -485,7 +490,7 @@ const removeLabTiming = (index,data) => {
           )}
 
 {isEditModalOpen && (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center font-kanit">
     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
       <h3 className="text-xl font-bold mb-4">Edit Course</h3>
       <form>
@@ -578,7 +583,7 @@ const removeLabTiming = (index,data) => {
             <div className="flex gap-2 mb-2">
               <select
                 className="p-2 border rounded-lg flex-1"
-                value={labTiming.day}
+                value={labTiming?.day}
                 onChange={(e) =>
                   setLabTiming({ ...labTiming, day: e.target.value })
                 }
@@ -593,7 +598,7 @@ const removeLabTiming = (index,data) => {
               <input
                 type="time"
                 className="p-2 border rounded-lg flex-1"
-                value={labTiming.startTime}
+                value={labTiming?.startTime}
                 onChange={(e) =>
                   setLabTiming({ ...labTiming, startTime: e.target.value })
                 }
@@ -601,7 +606,7 @@ const removeLabTiming = (index,data) => {
               <input
                 type="time"
                 className="p-2 border rounded-lg flex-1"
-                value={labTiming.endTime}
+                value={labTiming?.endTime}
                 onChange={(e) =>{
                   setLabTiming({ ...labTiming, endTime: e.target.value });
                   }

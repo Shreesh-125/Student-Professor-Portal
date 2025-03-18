@@ -37,10 +37,29 @@ const studentSchema= new mongoose.Schema({
         attendance:{
             type:Number
         },
-        lastUpdated: {  //YYYY-MM-DDTHH:mm:ss.sssZ   T is separator And Z is endpoint
+        lastUpdated: {  //YYYY-MM-DDTHH:mm:ss.sss   T is separator And Z is endpoint
             type: Date,
             default: Date.now // Automatically set the current time when created
         }
+    }],
+    marks:[{
+        course:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:'Courses',
+        },
+        mark:[{
+            patternid:{
+                type:mongoose.Schema.Types.ObjectId,
+            },
+            marks:{
+                type:Number,
+                default:0
+            },
+            lastUpdated: {  //YYYY-MM-DDTHH:mm:ss.sss   T is separator And Z is endpoint
+                type: Date,
+                default: Date.now // Automatically set the current time when created
+            }
+        }]
     }]
 })
 

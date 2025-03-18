@@ -12,11 +12,14 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import axios from "axios";
 import { USER_API_END_POINT } from "@/utils/constant";
-import { MdDelete } from "react-icons/md";
+import { MdDelete, MdPictureAsPdf } from "react-icons/md";
+import { FaEye } from "react-icons/fa";
 
 // A simple loading spinner component
 const LoadingSpinner = () => (
-  <div className="animate-spin border-t-2 border-blue-500 border-solid w-8 h-8 rounded-full" />
+  <div className="flex justify-center items-center mt-10">
+    <div className="animate-spin border-t-4 border-gray-500 border-solid w-12 h-12 rounded-full"></div>
+  </div>
 );
 
 function UploadPdf() {
@@ -55,7 +58,7 @@ function UploadPdf() {
     };
 
     fetchUploadedPdfs();
-  }, [courseCode, user, navigate]);
+  }, [courseCode, user, navigate,isUploading]);
 
   // Handle PDF upload
   const handleUpload = async (event) => {
@@ -68,7 +71,7 @@ function UploadPdf() {
         setIsUploading(true);
   
         const response = await axios.post(
-          `${USER_API_END_POINT}/professor/courses/${courseCode}/uploadpdf`,
+          `${USER_API_END_POINT}/professor/courses/${courseCode}/uploadpdfbysupabase`,
           formData,
           { withCredentials: true }
         );
@@ -92,16 +95,19 @@ function UploadPdf() {
     }
   };
 
+  function handleview(pdf) {
+    window.open(pdf.url, "_blank");
+  }
+
   // Handle PDF delete
   const handleDelete = async () => {
     setIsDeleting(true); // Start deleting process
     try {
+      const pdfname = selectedPdf.name; // Access `url` from the selected PDF object
       
-      
-      const pdfId = selectedPdf._id; // Access `url` from the selected PDF object
       const url = selectedPdf.url;
       const response = await axios.delete(
-        `${USER_API_END_POINT}/professor/courses/${courseCode}/deletepdf/${pdfId}`,
+        `${USER_API_END_POINT}/professor/courses/${courseCode}/deletepdfbysupabase/${pdfname}`,
         {
           data: { pdfUrl: url }, // Send pdfUrl in the request body
           withCredentials: true,
@@ -128,48 +134,65 @@ function UploadPdf() {
   <Sidebar />
   
   <div className="p-6 flex-1">
-    <h1 className="text-4xl font-extrabold text-blue-900 border-b-4 border-blue-500 pb-2 mb-10 mt-14 md:mt-6">Upload PDF</h1>
+    <h1 className="text-[40px] font-bold font-kanit text-[#121A27] border-b-4 border-gray-500 pb-2 mt-14 md:mt-6">Upload PDF</h1>
 
-    {/* Uploaded PDFs */}
-    <div className="flex flex-wrap gap-6">
-      {uploadedPdfs.map((pdf, idx) => (
-        <div
-          key={idx}
-          className="relative w-40 h-40 border border-gray-300 rounded-lg flex items-center justify-center bg-white shadow-md"
-        >
-          <p className="text-center text-sm px-2">{pdf.name}</p>
-          <button
-            onClick={() => {
-              setSelectedPdf(pdf);
-              setIsDeleteModalOpen(true);
-            }}
-            className="absolute top-2 right-2 text-red-500 hover:text-red-700 z-10"
+    {loading ? (<LoadingSpinner/>) :
+      (
+        <div className="flex flex-wrap gap-6 mt-10 ">
+        {uploadedPdfs.map((pdf, idx) => (
+          <div
+            key={idx}
+            className="relative w-56 h-32 border border-gray-300 gap-4 rounded-lg flex flex-col items-center justify-center bg-white shadow-md transform transition-transform duration-300 hover:scale-110"
           >
-            <MdDelete />
-          </button>
-        </div>
-      ))}
+            <div className="flex items-center">
+            <MdPictureAsPdf size={23} />
+            <p className="text-center text-lg px-2 font-kanit font-semibold text-[#121A27]">{pdf.name.substring(14)}</p>
+            </div>
 
-      {/* Add PDF Box */}
-      <div
-        onClick={() => setIsUploadModalOpen(true)}
-        className="w-40 h-40 flex items-center justify-center border-2 border-dashed border-gray-400 rounded-lg cursor-pointer hover:bg-gray-100"
-      >
-        <span className="text-gray-400 text-4xl">+</span>
-      </div>
+            <div className="flex justify-between w-[80%]">
+
+            <button onClick={()=> handleview(pdf)}>
+            <FaEye size={23} className="text-[#121A27] hover:text-blue-600" />
+            </button>
+
+            <button
+              onClick={() => {
+                setSelectedPdf(pdf);
+                setIsDeleteModalOpen(true);
+              }}
+              className=" right-2 text-[#121A27] hover:text-red-500 z-10"
+            >
+              <MdDelete size={25} />
+            </button>
+            
+            </div>
+            
+          </div>
+    ))}
+
+    {/* Add PDF Box */}
+    <div
+      onClick={() => setIsUploadModalOpen(true)}
+      className="w-56 h-32 flex items-center justify-center border-2 border-dashed border-gray-400 rounded-lg cursor-pointer hover:bg-gray-100"
+    >
+      <span className="text-gray-400 text-4xl">+</span>
     </div>
+  </div>
+      )
+    }
+    
 
     {/* Upload Modal */}
-    <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen}>
+    <Dialog open={isUploadModalOpen} onOpenChange={setIsUploadModalOpen} >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Upload PDF</DialogTitle>
+          <DialogTitle className='font-kanit border-b-2 border-gray-300 pb-2 text-[#121A27] text-2xl' >Upload PDF</DialogTitle>
         </DialogHeader>
         <input
           type="file"
           accept=".pdf"
           onChange={handleUpload}
-          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100"
+          className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 font-kanit"
         />
         {isUploading && (
           <div className="flex justify-center mt-4">
@@ -180,12 +203,12 @@ function UploadPdf() {
     </Dialog>
 
     {/* Delete Confirmation Modal */}
-    <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+    <Dialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen} >
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Confirmation</DialogTitle>
-        </DialogHeader>
-        <p>Are you sure you want to delete {selectedPdf?.name}?</p>
+          <DialogTitle className='font-kanit border-b-2 border-gray-300 pb-2 text-[#121A27] text-2xl'>Delete Confirmation</DialogTitle>
+        </DialogHeader >
+        <p className='font-kanit'>Are you sure you want to delete {selectedPdf?.name.substring(14)}?</p>
         <DialogFooter>
           <Button variant="outline" onClick={() => setIsDeleteModalOpen(false)}>
             Cancel

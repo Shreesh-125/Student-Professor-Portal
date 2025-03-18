@@ -14,4 +14,21 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({ storage, fileFilter });
 
-export default upload;
+
+// New Multer configuration for Excel files
+const excelFileFilter = (req, file, cb) => {
+  // Only accept .xlsx or .xls files
+  const ext = path.extname(file.originalname).toLowerCase();
+  if (ext !== ".xlsx" && ext !== ".xls") {
+    cb(new Error("Only Excel files (.xlsx or .xls) are allowed"), false);
+  } else {
+    cb(null, true);
+  }
+};
+
+const excelStorage = multer.memoryStorage(); // Store in memory for processing
+const excelUpload = multer({ storage: excelStorage, fileFilter: excelFileFilter });
+
+export { excelUpload,upload };
+
+

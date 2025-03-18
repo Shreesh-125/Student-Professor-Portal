@@ -43,16 +43,16 @@ function ChangePassword() {
   };
 
   return (
-    <div className="min-h-screen flex bg-gray-50">
+<div className="min-h-screen flex bg-gray-50">
   <Sidebar />
   <div className="flex-grow p-6 mt-10 md:mt-0">
     {/* Page Header */}
-    <h2 className="text-3xl font-extrabold mb-6 text-blue-900 border-b-4 border-blue-500 pb-2 ">
+    <h2 className="text-[40px] font-bold font-kanit text-[#121A27] border-b-4 border-gray-500 pb-2 mb-10 md:mt-6">
       Change Password
     </h2>
 
     {/* Form */}
-    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 shadow-lg rounded-xl">
+    <form onSubmit={handleSubmit} className="max-w-md mx-auto bg-white p-6 shadow-md rounded-xl font-kanit">
       {/* New Password Field */}
       <div className="mb-6">
         <label htmlFor="password" className="block font-medium text-gray-700 mb-2">
@@ -90,7 +90,7 @@ function ChangePassword() {
       <div className="flex justify-end gap-4">
         <button
           type="reset"
-          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400 transition"
+          className="px-4 py-2 bg-gray-300 text-gray-700 rounded-lg hover:bg-gray-400"
           onClick={() => {
             setPassword('');
             setConfirmPassword('');
@@ -103,7 +103,7 @@ function ChangePassword() {
           className={`px-4 py-2 text-white rounded-lg ${
             loading
               ? 'bg-gray-400 cursor-not-allowed'
-              : 'bg-[#29648A] hover:bg-[#5B91B2] transition'
+              : 'bg-[#121A27] hover:bg-[#27364B] focus:ring-2 focus:ring-gray-500'
           }`}
           disabled={loading}
         >

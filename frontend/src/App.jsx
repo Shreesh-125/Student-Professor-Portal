@@ -27,6 +27,9 @@ import Professor from "./components/Admin/Professor";
 import Courses from "./components/Admin/Courses";
 import AdminStudentPage from "./components/Admin/Students"
 import AdminChangePassword from "./components/Admin/ChangePassword"
+import UpdateMarks from "./components/Professor/UpdateMaks";
+import ExtraClass from "./components/Professor/ExtraClass";
+import Marks from "./components/Student/Marks";
 
 // Layout Component with Navbar
 function Layout() {
@@ -76,6 +79,8 @@ const appRouter = createBrowserRouter([
           {path:"courses/:courseCode/updateattendance", element:<UpdateAttendance/>},
           {path:"courses/:courseCode/students", element:<Students/> },
           {path:"courses/:courseCode/updatepattern", element:<UpdatePattern/>},
+          {path:"courses/:courseCode/:patternid",element:<UpdateMarks/>},
+          {path:"addextraclass",element:<ExtraClass/>},
           { path: "changePassword", element:<ProfChangePassword/> }, // Matches /professor/login
         ],
       },
@@ -88,6 +93,7 @@ const appRouter = createBrowserRouter([
           { path: "courses/:courseCode",  element: <StdCourseDetails/>}, // Matches /student/login
           { path: "courses/:courseCode/uploadedpdf",  element: <UploadedPdf/>}, // Matches /student/login
           { path: "courses/:courseCode/pattern",  element: <Pattern/>}, // Matches /student/login
+          { path: "courses/:courseCode/marks",  element: <Marks/>}, // Matches /student/login
           { path: "courses/:courseCode/professordetails",  element: <ProfessorDetails/>}, // Matches /student/login
           { path: "attendance", element:<Attendance/>  }, // Matches /student/login
           { path: "changepassword", element:<ChangePassword/>  }, // Matches /student/login

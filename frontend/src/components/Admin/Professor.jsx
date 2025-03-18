@@ -5,6 +5,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { USER_API_END_POINT } from '@/utils/constant';
 import { toast } from 'sonner';
+import { User } from 'lucide-react';
 
 function UpdateAttendance() {
     const { user } = useSelector((store) => store.app);
@@ -141,24 +142,26 @@ function UpdateAttendance() {
   return (
     <div className="min-h-screen flex bg-gray-50">
       <Sidebar />
-      <div className="flex flex-col w-full p-6">
+      <div className="flex flex-col w-full p-6 font-kanit">
         {/* Add professor Button */}
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-extrabold mt-10 md:mt-6 text-blue-900 md:text-4xl">Professor</h2>
+          <div className='border-b-4 border-gray-900'>
+          <h2 className="text-3xl font-extrabold mt-10 md:mt-6 text-[#121A27] md:text-4xl">Professor</h2>
+          </div>
           <button
-            className="flex items-center justify-center bg-green-500 text-white p-2 rounded-lg shadow-lg hover:bg-green-600"
+            className="flex items-center justify-center bg-gray-900 text-white p-2 rounded-lg shadow-lg hover:bg-gray-800"
             onClick={() => setIsAddModalOpen(true)}
           >
-            <span className="text-xl font-bold">+</span> Add Professor
+            <span className=" font-medium"> Add Professor</span>
           </button>
         </div>
 
         {/* Search Bar */}
-        <div className="relative w-64 mb-10">
+        <div className="relative w-56 md:w-60 lg:w-96 mb-10">
           <input
             type="text"
             placeholder="Search Prof Code..."
-            className="w-full p-2 text-sm border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-400"
+            className="w-full h-12 px-4 text-md font-kanit border rounded-lg shadow-md focus:outline-none focus:ring-2 focus:ring-[#333945]"
             value={searchQuery}
             onChange={handleSearchChange}
           />
@@ -166,46 +169,55 @@ function UpdateAttendance() {
 
         {/* professor Cards */}
         <div className="flex flex-wrap gap-6">
-          {filteredprofessor.length > 0 ? (
-            filteredprofessor.map((std,idx) => (
-              <div
-                key={idx}
-                className="w-full sm:w-1/2 lg:w-1/3 p-4 bg-white border rounded-lg shadow-lg hover:shadow-xl hover:scale-105 transform transition-all duration-300"
-              >
-                <div className="flex justify-between items-center mb-2">
-                  <p className="text-lg font-semibold text-gray-700">{std?.fullname}</p>
-                  <p className="text-sm text-gray-500">{std?.profCode}</p>
-                </div>
-                <div className="flex justify-between mt-4">
-                  <button
-                    className="text-blue-500 hover:underline"
-                    onClick={() =>{ setIsEditModalOpen(true);seteditProfessor(std); console.log(std);
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="text-red-500 hover:underline"
-                    onClick={() => {
-                      setprofessorToDelete(std);
-                      setIsDeleteModalOpen(true);
-                    }}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No professor found</p>
-          )}
+  {filteredprofessor.length > 0 ? (
+    filteredprofessor.map((prof, idx) => (
+      <div
+        key={idx}
+        className="w-full sm:w-1/2 lg:w-1/3 p-5 bg-white border border-gray-200 rounded-2xl shadow-md hover:shadow-lg transform transition-all duration-300 hover:scale-105"
+      >
+        {/* Profile Header */}
+        <div className="flex items-center gap-3 mb-3">
+          <User className="text-[#27364B] text-2xl" />
+          <div className="flex flex-col">
+            <p className="text-lg font-bold text-[#121A27]">{prof?.fullname}</p>
+            <p className="text-sm text-gray-500">{prof?.profCode}</p>
+          </div>
         </div>
+
+        {/* Actions */}
+        <div className="flex justify-between items-center mt-4">
+          <button
+            className="px-3 py-1 text-sm font-semibold text-white bg-blue-600 rounded-lg shadow-md hover:bg-blue-700 transition-all"
+            onClick={() => {
+              setIsEditModalOpen(true);
+              seteditProfessor(prof);
+            }}
+          >
+            Edit
+          </button>
+          <button
+            className="px-3 py-1 text-sm font-semibold text-white bg-red-600 rounded-lg shadow-md hover:bg-red-700 transition-all"
+            onClick={() => {
+              setprofessorToDelete(prof);
+              setIsDeleteModalOpen(true);
+            }}
+          >
+            Delete
+          </button>
+        </div>
+      </div>
+    ))
+  ) : (
+    <p className="text-gray-500 text-center w-full">No professor found</p>
+  )}
+</div>
+
       </div>
 
       {/* Add professor Modal */}
       {/* Add professor Modal */}
             {isAddModalOpen && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center font-kanit">
                 <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
                 <h3 className="text-2xl font-bold mb-4">Add professor</h3>
                 <form>
@@ -336,7 +348,7 @@ function UpdateAttendance() {
             )}
 
 {isEditModalOpen && (
-  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center ">
+  <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center font-kanit">
     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg mx-2">
       <h3 className="text-2xl font-bold mb-4">Edit professor</h3>
       <form>
@@ -460,7 +472,7 @@ function UpdateAttendance() {
 
       {/* Delete Confirmation Modal */}
       {isDeleteModalOpen && (
-          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center font-kanit">
             <div className="bg-white p-6 rounded-lg shadow-lg">
               <h3 className="text-xl font-bold mb-4">Confirm Deletion</h3>
               <p>Are you sure you want to delete this professor?</p>

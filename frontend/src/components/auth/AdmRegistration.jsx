@@ -1,7 +1,7 @@
 import { setLoading, setUser } from '@/redux/appSlice';
 import { USER_API_END_POINT } from '@/utils/constant';
 import { Label } from '@radix-ui/react-label';
-import image from '../../../public/AdmLoginImg.png';
+import image from '/AdmLoginImg.png';
 import React, { useState } from 'react';
 import axios from "axios";
 import { useDispatch, useSelector } from 'react-redux';
@@ -76,77 +76,85 @@ function AdmRegistration() {
         }
     };
   return (
-          <div className='flex flex-col items-center gap-16 bg-gray-50 min-h-screen'>
-               <h1 className="text-5xl  font-inter mt-16 font-bold text-gray-800 drop-shadow-md text-center">
-                  Academic Portal
-              </h1>
-  
-              <div className="flex w-[80vw] md:w-[750px] h-[450px] shadow-lg rounded-xl overflow-hidden bg-white border border-gray-200 ">
-                  {/* Left Container */}
-                  <div className="w-full flex flex-col items-center md:w-1/2">
-                      <form onSubmit={submitHandler} className="my-10 flex flex-col">
-                          <h1 className="text-3xl font-inter font-bold text-gray-700 mb-10 mt-4">Admin SignUp</h1>
-                          
-                          {/* Email Input */}
-                          <div className="my-2 w-[250px]">
-                              <Label>Email</Label>
-                              <Input 
-                                  value={input.email} 
-                                  name="email" 
-                                  onChange={changeEventHandler} 
-                                  type="email" 
-                                  placeholder="Email" 
-                              />
-                              {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
-                          </div>
+    <div className="flex flex-col items-center gap-16 bg-gradient-to-br from-gray-50 via-gray-100 to-gray-200 min-h-screen">
+    {/* Title */}
+    <h1 className="text-5xl mt-16 font-bold text-[#121A27] drop-shadow-md text-center font-kanit">
+        Student-Professor Portal
+    </h1>
 
-                          {/* Secret Key */}
-                          <div className="my-2 w-[250px]">
-                              <Label>Secret Key</Label>
-                              <Input 
-                                  value={input.secretKey} 
-                                  name="secretKey" 
-                                  onChange={changeEventHandler} 
-                                  type="text" 
-                                  placeholder="Secret Key" 
-                              />
-                              {errors.secretKey && <p className="text-red-500 text-sm mt-1">{errors.secretKey}</p>}
-                          </div>
-                          
-                          {/* Password Input */}
-                          <div className="my-2 w-[250px]">
-                              <Label>Password</Label>
-                              <Input 
-                                  value={input.password} 
-                                  name="password" 
-                                  onChange={changeEventHandler} 
-                                  type="password" 
-                                  placeholder="Password" 
-                              />
-                              {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
-                          </div>
-                          
-                          {/* Submit Button */}
-                          {
-                              loading 
-                                  ? <Button className="w-full my-4"> 
-                                      <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
-                                    </Button>
-                                  : <Button type="submit" className="w-full my-4 bg-[#29648A]">Login</Button>
-                          }
-                      </form>
-                  </div>
-  
-                  {/* Right Container */}
-                  <div className="hidden md:block w-1/2">
-                      <img
-                          className="object-cover w-full h-full rounded-r-xl"
-                          src={image}
-                          alt="Login Illustration"
-                      />
-                  </div>
-              </div>
-          </div>
+    {/* Main Container */}
+    <div className="flex w-[80vw] md:w-[750px] h-[450px] shadow-2xl rounded-2xl overflow-hidden bg-white border border-gray-300 font-kanit">
+        {/* Left Container */}
+        <div className="w-full flex flex-col items-center md:w-1/2">
+            <form onSubmit={submitHandler} className="my-10 flex flex-col">
+                <h1 className="text-3xl font-bold text-[#121A27] mb-4 mt-4">Admin SignUp</h1>
+
+                {/* Email Input */}
+                <div className="my-2 w-[250px]">
+                    <Label>Email</Label>
+                    <Input
+                        className="focus:outline-none"
+                        value={input.email}
+                        name="email"
+                        onChange={changeEventHandler}
+                        type="email"
+                        placeholder="Email"
+                    />
+                    {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
+                </div>
+
+                {/* Secret Key Input */}
+                <div className="my-2 w-[250px]">
+                    <Label>Secret Key</Label>
+                    <Input
+                        className="focus:outline-none"
+                        value={input.secretKey}
+                        name="secretKey"
+                        onChange={changeEventHandler}
+                        type="text"
+                        placeholder="Secret Key"
+                    />
+                    {errors.secretKey && <p className="text-red-500 text-sm mt-1">{errors.secretKey}</p>}
+                </div>
+
+                {/* Password Input */}
+                <div className="my-2 w-[250px]">
+                    <Label>Password</Label>
+                    <Input
+                        className="focus:outline-none"
+                        value={input.password}
+                        name="password"
+                        onChange={changeEventHandler}
+                        type="password"
+                        placeholder="Password"
+                    />
+                    {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
+                </div>
+
+                {/* Submit Button */}
+                {loading ? (
+                    <Button className="w-full my-4">
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Please Wait
+                    </Button>
+                ) : (
+                    <Button type="submit" className="w-full my-4 bg-[#121A27] text-white hover:bg-[#1E1E2A] transition duration-300">
+                        Sign Up
+                    </Button>
+                )}
+            </form>
+        </div>
+
+        {/* Right Container */}
+        <div className="hidden md:block w-1/2">
+            <img
+                className="object-cover w-full h-full rounded-r-2xl"
+                src={image}
+                alt="SignUp Illustration"
+            />
+        </div>
+    </div>
+</div>
+
       );
 }
 

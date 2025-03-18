@@ -34,11 +34,11 @@ function Sidebar() {
   const isActive = (path) => {
     // Handle 'Home' link separately, match only '/student'
     if (path === '/student') {
-      return location.pathname === path ? 'bg-[#1A4F72] text-white' : 'text-gray-400 hover:bg-[#29648A] hover:text-white';
+      return location.pathname === path ? 'bg-[#333945]  text-white' : 'text-gray-400 hover:bg-[#333945] hover:text-white';
     }
     
     // For all other links, check if the pathname starts with the path
-    return location.pathname.startsWith(path) ? 'bg-[#1A4F72] text-white' : 'text-gray-400 hover:bg-[#29648A] hover:text-white';
+    return location.pathname.startsWith(path) ? 'bg-[#333945]  text-white' : 'text-gray-400 hover:bg-[#333945] hover:text-white';
   };
 
   if(!user){
@@ -58,7 +58,7 @@ function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`${isOpen ? "translate-x-0" : "-translate-x-full"} fixed md:translate-x-0 md:static top-0 left-0 min-h-full w-64 bg-[#29648A] flex flex-col shadow-lg transform transition-transform duration-300 z-40`}
+        className={`${isOpen ? "translate-x-0" : "-translate-x-full"} fixed md:translate-x-0 md:static top-0 left-0 min-h-full w-64 bg-[#121A27] flex flex-col shadow-lg transform transition-transform duration-300 z-40`}
       >
         {/* Sidebar Links */}
         <nav className="flex-1  space-y-4 pt-40 md:pt-0">
@@ -68,7 +68,7 @@ function Sidebar() {
             onClick={() => isOpen && toggleSidebar()}
           >
             <IoMdHome size={20} />
-            <span className="text-sm font-bold">Home</span>
+            <span className="text-sm font-semibold font-kanit">Home</span>
           </Link>
 
           <Link
@@ -77,7 +77,7 @@ function Sidebar() {
             onClick={() => isOpen && toggleSidebar()}
           >
             <FaChalkboardTeacher size={20} />
-            <span className="text-sm font-bold">Courses</span>
+            <span className="text-sm font-semibold font-kanit">Courses</span>
           </Link>
 
           <Link
@@ -86,7 +86,7 @@ function Sidebar() {
             onClick={() => isOpen && toggleSidebar()}
           >
             <FaChalkboardTeacher size={20} />
-            <span className="text-sm font-bold">Attendance</span>
+            <span className="text-sm font-semibold font-kanit">Attendance</span>
           </Link>
 
           <Link
@@ -95,16 +95,16 @@ function Sidebar() {
             onClick={() => isOpen && toggleSidebar()}
           >
             <RiLockPasswordFill size={20} />
-            <span className="text-sm font-bold">Change Password</span>
+            <span className="text-sm font-semibold font-kanit">Change Password</span>
           </Link>
 
           <div onClick={handleLogout}>
             <Link
               to="/"
-              className="flex items-center gap-4 p-3 hover:bg-[#29648A] hover:text-white rounded-md"
+              className="flex items-center gap-4 p-3 hover:bg-[#333945] hover:text-white rounded-md"
             >
-              <FaSignOutAlt size={20} />
-              <span className="text-sm font-bold">Logout</span>
+              <FaSignOutAlt size={20} className="text-white"/>
+              <span className="text-sm font-semibold font-kanit text-white">Logout</span>
             </Link>
           </div>
         </nav>

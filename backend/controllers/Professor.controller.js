@@ -4,6 +4,8 @@ import { Professor } from "../models/Professor.model.js";
 import { Student } from "../models/student.model.js";
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
+import XLSX from "xlsx";
+import supabase from "../Supabase/supabase.js";
 
 
 export  const login=async(req,res)=>{
@@ -382,8 +384,13 @@ export const addExtraClass =async (req,res)=>{
       .reverse()
       .join("-"); // Converts to "DD-MM-YYYY"
 
-    const {courseCode}=req.params;
-    const {date,time}= req.body;
+    const {date,time,courseCode}= req.body;
+
+    const prof=await Professor.findById(req.id);
+    
+    
+    
+    
 
     if (!date || !time) {
       return res.status(400).json({
@@ -414,11 +421,37 @@ export const addExtraClass =async (req,res)=>{
       courseCode,
     });
 
-    course.extraClass = course.extraClass.filter((extraClass) => {
+    if(!course){
+      return res.status(400).json({
+        message:"Course Not Found",
+        success:false
+      })
+    }
+
+    let isCourse=false;
+
+    prof.courses.map((course)=>{
+      if(course.equals(course._id)){
+        isCourse=true;
+      }
+    })
+
+    if(!isCourse){
+      return res.status(400).json({
+        message:"Course Not Found",
+        success:false
+      })
+    }
+    
+
+    course.extraClass = course.extraClass?.filter((extraClass) => {
       const [day, month, year] = extraClass.date.split("-").map(Number);
       const extraClassDate = new Date(year, month - 1, day);
       return extraClassDate >= currentDate; // Keep only future or current date classes
     });
+
+
+  
 
     course.extraClass.push({ date, time });
 
@@ -458,7 +491,7 @@ export const addExtraClass =async (req,res)=>{
     };
 
      // Extract extraClass and classTiming conflicts
-     const conflicts = [];
+    const conflicts = [];
      const extraClassWeekday = getWeekday(date);
      
 
@@ -479,6 +512,17 @@ export const addExtraClass =async (req,res)=>{
           });
         }
       });
+
+      otherCourse.labTiming.forEach((otherLabTiming)=>{
+        if(otherLabTiming.day===extraClassWeekday && (time>=otherLabTiming.startTime && time<=otherLabTiming.endTime)){
+          conflicts.push({
+            conflictType: "Lab",
+            courseCode: otherCourse.courseCode,
+            conflictDate: otherLabTiming.date,
+            conflictTime: time,
+          });
+        }
+      })
 
       // Check conflicts with extraClass of other courses
       otherCourse.extraClass.forEach((otherExtraClass) => {
@@ -690,8 +734,6 @@ export const addPattern= async (req,res)=>{
   try {
     const {courseCode}=req.params;
 
-    
-
     const {pattern}= req.body;
 
     if(!pattern || !pattern.name || !pattern.weightage){
@@ -700,6 +742,8 @@ export const addPattern= async (req,res)=>{
         success:false
       })
     }
+    // const students = await Student.find({ coursesOpted: { $in: [courseCode] } });
+
 
     let totalweightage=0;
     const course= await Courses.findOne({courseCode});
@@ -715,8 +759,6 @@ export const addPattern= async (req,res)=>{
     
     (course.pattern || []).forEach(pat=>{
       totalweightage+=pat.weightage;
-     
-      
     })
 
     totalweightage+=Number(pattern.weightage);
@@ -730,6 +772,24 @@ export const addPattern= async (req,res)=>{
     }
 
     course.pattern.push(pattern);
+
+    const students=await Student.find({coursesOpted:course._id});
+    
+    await Promise.all(
+      students.map(async (std)=>{
+        std?.marks.forEach((obj)=>{
+          
+          
+          if(obj.course.equals(course._id)){
+            obj.mark.push({
+              patternid:course.pattern[course.pattern.length-1]._id,
+              marks:0
+            })
+          }
+        })
+        await std.save()
+      })
+    )
 
     await course.save();
 
@@ -750,10 +810,11 @@ export const addPattern= async (req,res)=>{
 
 export const removePattern= async(req,res)=>{
   try {
-    const {courseCode}=req.params;
+    const {courseCode,patternId}=req.params;
 
-    const {patternId}= req.body;
-
+    
+ 
+    
     const course= await Courses.findOne({courseCode});
 
     if(!course){
@@ -767,6 +828,19 @@ export const removePattern= async(req,res)=>{
     
 
     await course.save();
+
+    const students=await Student.find({coursesOpted:course._id});
+    
+    await Promise.all(
+      students.map(async (std)=>{
+        std?.marks.forEach((obj)=>{
+          if(obj.course.equals(course._id)){
+            obj.mark = obj.mark.filter(x => !(x?.patternid.equals(patternId)));
+          }
+        })
+        await std.save();
+      })
+    )
 
     return res.status(200).json({
       message:"Pattern removed Successfully",
@@ -840,6 +914,333 @@ export const updateAttendance = async (req, res) => {
     console.log(error);
     return res.status(500).json({
       message: "Internal Server Error",
+      success: false,
+    });
+  }
+};
+
+export const updateAttendancebySheet= async(req,res)=>{
+try {
+  if (!req.file) {
+    return res.status(400).json({ success: false, message: "No file uploaded" });
+  }
+
+  const {courseCode}= req.params;
+
+  const course=await Courses.findOne({courseCode:courseCode});
+  if(!course){
+    res.status(400).json({
+      message:"Course Not Found",
+      success:false
+    })
+  }
+  const courseid=course._id;
+ 
+  
+  const buffer = req.file.buffer; // Excel file is stored in memory
+  const workbook = XLSX.read(buffer, { type: "buffer" });
+  const sheetName = workbook.SheetNames[0];
+  const sheet = workbook.Sheets[sheetName];
+
+  const data = XLSX.utils.sheet_to_json(sheet); // Convert Excel sheet to JSON
+
+  const headers = data[0]; // First row as headers
+  if (!headers["Roll No."] || !headers["Attendance"]) {
+    return res.status(400).json({
+      success: false,
+      message: "The sheet must contain 'Roll No.' and 'Attendance' columns in the first row",
+    });
+  }
+
+  const extractedData = data.map(row => ({
+    rollNo: row["Roll No."], // Adjust the column name as per your sheet
+    attendance: row["Attendance"],        // Adjust the column name as per your sheet
+  }));
+  
+  await Promise.all(
+    extractedData.map(async(obj)=>{
+      if(obj.attendance>100){
+        return res.status(400).json({
+          message:"Attendance cannot be grater than 100",
+          success:false
+        })
+      }
+      const std= await Student.findOne({rollNo:obj.rollNo});
+      std.courseAttendance.map(cor=>{
+        if(cor.course.equals(courseid)){
+          cor.attendance=obj.attendance;
+        }
+      })
+      std.save();
+    })
+  )
+
+  return res.status(200).json({
+    message:"Attendance Updated successfully",
+    success:true
+  })
+} catch (error) {
+  console.log(error);
+  return res.status(500).json({
+    message:"Internal Server Error",
+    success:false
+  })
+  
+}
+};
+
+export const updateMarksBySheet= async(req,res)=>{
+  try {
+    if (!req.file) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    const {patternid,courseCode}= req.params;
+   
+    
+    const course=await Courses.findOne({courseCode:courseCode});
+    if(!course){
+      res.status(400).json({
+        message:"Course Not Found",
+        success:false
+      })
+    }
+    const courseid=course._id;
+   
+    
+    const buffer = req.file.buffer; // Excel file is stored in memory
+    const workbook = XLSX.read(buffer, { type: "buffer" });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+
+    const data = XLSX.utils.sheet_to_json(sheet); // Convert Excel sheet to JSON
+
+    const headers = data[0]; // First row as headers
+    if (!headers["Roll No."] || !headers["Marks"]) {
+      return res.status(400).json({
+        success: false,
+        message: "The sheet must contain 'Roll No.' and 'Marks' columns in the first row",
+      });
+    }
+
+    const extractedData = data.map(row => ({
+      rollNo: row["Roll No."], // Adjust the column name as per your sheet
+      marks: row["Marks"],        // Adjust the column name as per your sheet
+    }));
+    
+    await Promise.all(
+      extractedData.map(async(obj)=>{
+        const std= await Student.findOne({rollNo:obj.rollNo});
+        std.marks.map(async(cr)=>{
+          if(cr.course.equals(courseid)){
+            cr.mark.map((x=>{
+              if(x.patternid.equals(patternid)){
+                x.marks=obj.marks;
+              }
+            }))
+          }
+        })
+        std.save();
+      })
+    )
+
+    return res.status(200).json({
+      message:"Marks Updated successfully",
+      success:true
+    })
+  } catch (error) {
+    console.error("Error processing Excel file:", error);
+    return res.status(500).json({ success: false, message: "Failed to process file" });
+  }
+}
+
+export const updateMarksIndividually=async(req,res)=>{
+  try {
+    const {courseCode,rollNo,patternid}= req.params;
+    const {marks}= req.body;
+    const course=await Courses.findOne({courseCode:courseCode});
+
+    if(!course){
+      res.status(400).json({
+        message:"Course Not Found",
+        success:false
+      })
+    }
+    const student= await Student.findOne({rollNo:rollNo});
+
+    if(!student){
+      res.status(400).json({
+        message:"Student Not Found",
+        success:false
+      })
+    }
+    let isupdate=false;
+    student.marks.map((obj)=>{
+      if(obj.course.equals(course._id)){
+        obj.mark.map(pat=>{
+          if(pat.patternid.equals(patternid)){
+            pat.marks=marks;
+            isupdate=true;
+          }
+        })
+      }
+    });
+    
+    await student.save();
+
+    if(!isupdate){
+      return res.status(400).json({
+        message:"Pattern not found",
+        success:false
+      })
+    }
+
+    return res.status(200).json({
+      message:"Marks updated Successfully",
+      success:true
+    })
+
+
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({
+      message:"Internal Server Error",
+      success:false
+    })
+    
+  }
+}
+
+
+
+export const uploadPdfbySupa = async (req, res) => {
+  try {
+    const { courseCode } = req.params;
+
+    // Ensure the file exists in the request
+    if (!req.files || !req.files.pdf) {
+      return res.status(400).json({
+        message: "No file uploaded. Please upload a PDF file.",
+        success: false,
+      });
+    }
+
+    // Extract the file from the request
+    const file = req.files.pdf;
+
+    
+    // Generate a unique name for the file to avoid overwriting
+    const uniqueFileName = `${Date.now()}-${file.name}`;
+    
+    // Upload the file to Supabase storage
+    const { data: uploadedFile, error: uploadError } = await supabase.storage
+      .from("portal_storage")
+      .upload(`public/${uniqueFileName}`, file.data, {
+        contentType: "application/pdf", // Explicitly set the content type
+      });
+
+    if (uploadError) {
+      console.error("Error uploading file to Supabase storage:", uploadError.message);
+      return res.status(500).json({
+        message: "Failed to upload file to storage.",
+        success: false,
+      });
+    }
+
+    // Get the public URL of the uploaded file
+    const { data: publicUrlData, error: publicUrlError } = supabase.storage
+      .from("portal_storage")
+      .getPublicUrl(`public/${uniqueFileName}`);
+
+    if (publicUrlError || !publicUrlData.publicUrl) {
+      console.error("Error retrieving public URL:", publicUrlError?.message);
+      return res.status(500).json({
+        message: "Failed to retrieve public URL for the uploaded file.",
+        success: false,
+      });
+    }
+ 
+    
+    // Find the course and update its uploadedPdf field
+    const course = await Courses.findOne({ courseCode });
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found.",
+        success: false,
+      });
+    }
+
+    // Add the uploaded PDF's URL and name to the uploadedPdf array
+    course.uploadedPdf.push({
+      url: publicUrlData.publicUrl,
+      name: uniqueFileName
+    });
+    await course.save();
+
+    return res.status(200).json({
+      message: "PDF uploaded successfully!",
+      pdfUrl: publicUrlData.publicUrl,
+      name:uniqueFileName,
+      success: true,
+    });
+  } catch (error) {
+    console.error("An error occurred while uploading the PDF:", error);
+    return res.status(500).json({
+      message: "An error occurred while uploading the PDF.",
+      success: false,
+    });
+  }
+};
+
+export const deletePdfFromSupa = async (req, res) => {
+  try {
+    const { courseCode, fileName } = req.params; // Assuming courseCode and fileName are passed as params
+
+    // Find the course in the database
+    const course = await Courses.findOne({ courseCode });
+    if (!course) {
+      return res.status(404).json({
+        message: "Course not found.",
+        success: false,
+      });
+    }
+
+    // Check if the file exists in the uploadedPdf array
+    const pdfIndex = course.uploadedPdf.findIndex((pdf) => pdf.name === fileName);
+    if (pdfIndex === -1) {
+      return res.status(404).json({
+        message: "PDF file not found in the course.",
+        success: false,
+      });
+    }
+    course.uploadedPdf=course.uploadedPdf.filter(pdf=>pdf.name!=fileName);
+    
+    // Remove the file from Supabase storage
+    const filePath = `public/${fileName}`; // Assuming the file is in the 'public' folder
+    const { error: deleteError } = await supabase.storage
+      .from("portal_storage")
+      .remove([filePath]);
+
+    if (deleteError) {
+      console.error("Error deleting file from Supabase storage:", deleteError.message);
+      return res.status(500).json({
+        message: "Failed to delete the file from storage.",
+        success: false,
+      });
+    }
+
+    // Remove the file reference from the database
+    course.uploadedPdf.splice(pdfIndex, 1);
+    await course.save();
+
+    return res.status(200).json({
+      message: "PDF deleted successfully.",
+      success: true,
+    });
+  } catch (error) {
+    console.error("An error occurred while deleting the PDF:", error);
+    return res.status(500).json({
+      message: "An error occurred while deleting the PDF.",
       success: false,
     });
   }

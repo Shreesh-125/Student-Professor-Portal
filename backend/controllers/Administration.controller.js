@@ -218,6 +218,7 @@ export const registerStudent=async (req,res)=>{
             });
         }
         }
+        
         courseObjectIds.forEach(course=>{
             courselst.push(course._id);
         })
@@ -228,9 +229,13 @@ export const registerStudent=async (req,res)=>{
         const hashedPassword= await bcrypt.hash(password,10);
 
         let courseAttendance=[];
-
+        let marks=[];
         courselst.map((id)=>{
             courseAttendance.push({course:id,attendance:100});
+            marks.push({
+                course:id,
+                mark:[]
+            })
         })
         
         
@@ -241,7 +246,8 @@ export const registerStudent=async (req,res)=>{
             password:hashedPassword,
             rollNo,
             coursesOpted:courselst,
-            courseAttendance
+            courseAttendance,
+            marks:marks
         })
         
         student= await Student.findOne({rollNo});
@@ -406,6 +412,7 @@ export const registerProfessor= async (req,res)=>{
                 success:false
             })
         }
+
         let professor= await Professor.findOne({profCode});
         if(professor){
             return res.status(400).json({
@@ -425,6 +432,8 @@ export const registerProfessor= async (req,res)=>{
         let courseObjectIds = [];
         
         courseObjectIds = await Courses.find({ courseCode: { $in: courses } });
+        console.log(courses);
+        
         if (courseObjectIds.length !==courses.length) {
             return res.status(400).json({
             message: 'One or more courses not found.',
@@ -454,10 +463,6 @@ export const registerProfessor= async (req,res)=>{
         })
 
        professor= await Professor.findOne({profCode});
-
-       
-       
-       
 
         await Promise.all(
             courses.map(async (courseCode)=>{
@@ -738,10 +743,20 @@ export const getStudents = async (req, res) => {
   
       // Find students who have opted for the given course
       const courses = await Courses.find();
+      
+
+      if(!courses){
+        console.log("Printing");
+        
+        return res.status(200).json({
+            success:true,
+            courses:[]
+        })
+      }
   
       let modifiedCourses=[];
   
-      courses.forEach(cr=>{
+      courses.map(cr=>{
         modifiedCourses.push({
           name:cr?.name,
           courseCode:cr?.courseCode,
@@ -752,8 +767,6 @@ export const getStudents = async (req, res) => {
         })
       })
   
-     console.log(modifiedCourses[0].labTiming);
-     
   
       // Return the details of the students
       return res.status(200).json({
@@ -761,7 +774,6 @@ export const getStudents = async (req, res) => {
         courses:modifiedCourses,
       });
     } catch (error) {
-      console.error("Error fetching students:", error);
       return res.status(500).json({
         success: false,
         message: "Internal server error",

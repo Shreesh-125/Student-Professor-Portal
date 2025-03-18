@@ -17,7 +17,13 @@ export default {
         sans: ['Roboto', 'sans-serif'], 
         montserrat: ['Montserrat', 'sans-serif'],
         serif: ['Merriweather', 'serif'], 
-        inter: ['Inter', 'sans-serif']
+        inter: ['Inter', 'sans-serif'],
+        kanit: ['Kanit', 'sans-serif'], // Add Kanit here
+    },
+    screens: {
+      'xs': '480px', // Custom breakpoint for extra small devices
+      '2xl': '1440px', // Custom breakpoint for larger screens
+      'lx': '1200px', // Custom breakpoint at 1100px
     },
   	}
   },
